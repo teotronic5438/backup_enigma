@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container-fluid px-4 mt-3">
+    <!-- Encabezado principal -->
+    <div class="d-flex align-items-center mb-4">
+        <i class="bi bi-clock-history fs-3 text-primary me-2"></i>
+        <h3 class="fw-bold text-primary m-0">Historial de Remitos</h3>
+    </div>
+
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb bg-light rounded p-2">
+            <li class="breadcrumb-item">
+                <i class="bi bi-house-door"></i> Inicio
+            </li>
+            <li class="breadcrumb-item">
+                Ingresos
+            </li>
+            <li class="breadcrumb-item text-primary" aria-current="page">Historial de Ingresos</li>
+        </ol>
+    </nav>
+
+    <!-- Tabla de historial -->
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-0">
+            <table class="table table-bordered table-hover m-0 align-middle">
+                <thead class="table-primary text-center">
+                    <tr>
+                        <th>#</th>
+                        <th>Número Remito</th>
+                        <th>Número viaje</th>
+                        <th>Detalle de transporte</th>
+                        <th>Depósito</th>
+                        <th>Fecha de ingreso</th>
+                        <th>Usuario</th>
+                        <th>Aprobado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody class="text-center">
+                    {% for remito in remitos %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ remito.numero_remito }}</td>
+                        <td>{{ remito.numero_viaje }}</td>
+                        <td>{{ remito.detalle_transporte }}</td>
+                        <td>{{ remito.deposito_id }}</td>
+                        <td>{{ remito.fecha_ingreso|date:"d M, Y" }}</td>
+                        <td>{{ remito.usuario.nombre }}</td>
+                        <td>
+                            {% if remito.aprobado %}
+                                <span class="badge bg-success px-3 py-2">Sí</span>
+                            {% else %}
+                                <span class="badge bg-secondary px-3 py-2">No</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{% url 'ver_remito' remito.pk %}" 
+                               class="badge bg-info text-dark px-3 py-2 shadow-sm">
+                               <i class="bi bi-eye"></i> Ver detalle
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="9" class="text-muted py-4">No hay registros en el historial.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

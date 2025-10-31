@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container-fluid px-4 mt-3">
+    <!-- Encabezado principal -->
+    <div class="d-flex align-items-center mb-4">
+        <i class="bi bi-truck fs-3 text-primary me-2"></i>
+        <h3 class="fw-bold text-primary m-0">Lista de Remitos</h3>
+    </div>
+
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb bg-light rounded p-2">
+            <li class="breadcrumb-item">
+                <i class="bi bi-house-door"></i> Inicio
+            </li>
+            <li class="breadcrumb-item">
+                Ingresos
+            </li>
+            <li class="breadcrumb-item text-primary" aria-current="page">Nuevos Ingresos</li>
+        </ol>
+    </nav>
+
+
+    <!-- Botón de nuevo remito -->
+    <div class="mb-3">
+        <a href="{% url 'crear_remito' %}" class="btn btn-primary shadow-sm">
+            <i class="bi bi-plus-circle me-2"></i>Nuevo Remito
+        </a>
+    </div>
+
+    <!-- Tabla de remitos -->
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-0">
+            <table class="table table-bordered table-hover m-0 align-middle">
+                <thead class="table-primary text-center">
+                    <tr>
+                        <th>#</th>
+                        <th>Número Remito</th>
+                        <th>Número viaje</th>
+                        <th>Detalle de transporte</th>
+                        <th>Depósito</th>
+                        <th>Fecha de ingreso</th>
+                        <th>Usuario</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody class="text-center">
+                    {% for remito in remitos %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ remito.numero_remito }}</td>
+                        <td>{{ remito.numero_viaje }}</td>
+                        <td>{{ remito.detalle_transporte }}</td>
+                        <td>{{ remito.deposito_id }}</td>
+                        <td>{{ remito.fecha_ingreso|date:"d M, Y" }}</td>
+                        <td>{{ remito.usuario.nombre }}</td>
+                        <td>
+                            <div class="d-flex justify-content-center gap-2">
+                                <a href="{% url 'editar_remito' remito.pk %}" 
+                                   class="badge bg-warning text-dark px-3 py-2 shadow-sm">
+                                   <i class="bi bi-pencil-square"></i> Editar
+                                </a>
+                                <a href="{% url 'eliminar_remito' remito.pk %}" 
+                                   class="badge bg-danger text-light px-3 py-2 shadow-sm">
+                                   <i class="bi bi-trash"></i> Eliminar
+                                </a>
+                                {% if not remito.aprobado %}
+                                <a href="{% url 'aprobar_remito' remito.pk %}" 
+                                   class="badge bg-success text-light px-3 py-2 shadow-sm">
+                                   <i class="bi bi-check2-circle"></i> Aprobar
+                                </a>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="8" class="text-muted py-4">No hay remitos registrados.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,217 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load custom_filters %}
+
+{% block title %}{{ titulo_pagina }}{% endblock %}
+
+{% block extra_head %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css">
+    <style>
+        .top-action-bar {
+            display: flex;
+            flex-direction: column;
+            padding: 1rem;
+            border-radius: 0.25rem;
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            margin-bottom: 1.5rem;
+        }
+
+        .top-action-bar .row {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+
+        .top-action-bar .form-group {
+            margin-bottom: 0;
+            margin-right: 1rem;
+        }
+
+        .top-action-bar .btn-group {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .search-input-group {
+            max-width: 300px;
+            flex-grow: 1;
+        }
+
+        .badge-estado {
+            padding: 0.35em 0.65em;
+            font-size: 0.75em;
+            font-weight: 700;
+            line-height: 1;
+            text-align: center;
+            white-space: nowrap;
+            vertical-align: baseline;
+            border-radius: 0.25rem;
+            display: inline-block;
+        }
+
+        .badge-estado.bg-revisado { background-color: #6c757d; color: #fff; }
+        .badge-estado.bg-pendiente { background-color: #0d6efd; color: #fff; }
+        .badge-estado.bg-palletizado { background-color: #28a745; color: #fff; }
+        .badge-estado.bg-despachado { background-color: #ffc107; color: #212529; }
+        .badge-estado.bg-nuevo { background-color: #0dcaf0; color: #fff; }
+        .badge-estado.bg-averia { background-color: #dc3545; color: #fff; }
+        .badge-estado.bg-destruccion { background-color: #343a40; color: #fff; }
+        .badge-estado.bg-desconocido, .badge-estado.bg-otro { background-color: #e2e6ea; color: #212529; }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="page-container px-4 mt-3">
+    <div class="d-flex align-items-center mb-4">
+        <i class="bi bi-truck me-2" style="font-size: 2rem; color: #0d6efd;"></i>
+        <h2 class="fw-bold text-primary mb-0">{{ titulo_pagina }}</h2>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}" role="alert">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="top-action-bar mb-4">
+        <form method="get" class="w-100">
+            <div class="row mb-2">
+                <div class="col-md-6 col-lg-4">
+                    <div class="input-group search-input-group">
+                        <input type="text" class="form-control" placeholder="Buscar por ID Orden o Nro. Serie" name="q" value="{{ query_actual|default:'' }}">
+                        <button class="btn btn-primary" type="submit"><i class="bi bi-search"></i> Buscar</button>
+                    </div>
+                </div>
+                {% if titulo_pagina == "Órdenes Revisadas" %}
+                    <div class="col-auto">
+                        <button class="btn btn-info" type="submit">Aplicar Filtros</button>
+                    </div>
+                    <div class="col-auto">
+                        <a href="?q=" class="btn btn-secondary">Limpiar Filtros</a>
+                    </div>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+
+    <h3 class="mb-3"><i class="bi bi-box-seam-fill text-success me-2"></i> Pallets Activos (Pendientes de Despacho)</h3>
+
+    {% if mensaje_busqueda %}
+        <div class="alert alert-warning" role="alert">{{ mensaje_busqueda }}</div>
+    {% elif not pallets_activos %}
+        <div class="alert alert-info" role="alert">No hay pallets pendientes de despacho para mostrar en este momento.</div>
+    {% endif %}
+
+    {% for pallet in pallets_activos %}
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5><i class="bi bi-box-seam"></i> Pallet Nro: {{ pallet.nro_pallet }} (ID: {{ pallet.id }})</h5>
+                <form action="{% url 'despachos:despachar_pallet' %}" method="post" style="margin: 0;">
+                    {% csrf_token %}
+                    <input type="hidden" name="pallet_id_a_despachar" value="{{ pallet.id }}">
+                    <button type="submit" class="btn btn-success">Despachar Pallet</button>
+                </form>
+            </div>
+            <div class="card-body">
+                {% if pallet.ordenes %}
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>ID Orden</th>
+                                <th>Serial</th>
+                                <th>Modelo</th>
+                                <th>Marca</th>
+                                <th>Destino</th>
+                                <th>Estado</th>
+                                <th>Fecha Creación</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for orden in pallet.ordenes %}
+                                <tr>
+                                    <td>{{ orden.id }}</td>
+                                    <td>{{ orden.numero_serie }}</td>
+                                    <td>{{ orden.modelo }}</td>
+                                    <td>{{ orden.marca }}</td>
+                                    <!-- <td><span class="badge-estado bg-{ { pallet.destino|lower|replace_chars:' :-' } }">{ { pallet.destino } }</span></td> -->
+                                    <td>
+                                        {% if pallet.destino  == "Pendiente" %}
+                                            <span class="badge bg-warning">{{ pallet.destino  }}</span>
+                                        {% elif pallet.destino  == "Revisado" %}
+                                            <span class="badge bg-success">{{ pallet.destino  }}</span>
+                                        {% elif pallet.destino  == "Palletizado" %}
+                                            <span class="badge bg-primary">{{ pallet.destino }}</span>
+                                        {% elif pallet.destino  == "Despachado" %}
+                                            <span class="badge bg-secondary">{{ pallet.destino  }}</span>
+                                        {% else %}
+                                            <span class="badge bg-light text-dark">{{ pallet.destino  }}</span>
+                                        {% endif %}
+                                    </td>
+
+                                    <td><span class="badge-estado bg-palletizado">Palletizado</span></td>
+                                    <td>{{ pallet.fecha_creacion|date:"d/m/Y H:i" }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% endif %}
+            </div>
+        </div>
+    {% endfor %}
+
+    <hr class="my-5">
+
+    <h3 class="mb-3"><i class="bi bi-archive-fill text-secondary me-2"></i> {{ titulo_historial }}</h3>
+
+    {% if not pallets_despachados %}
+        <div class="alert alert-info" role="alert">No hay pallets despachados en el historial para este destino.</div>
+    {% else %}
+        {% for pallet in pallets_despachados %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5><i class="bi bi-box-seam"></i> Pallet Nro: {{ pallet.nro_pallet }} (ID: {{ pallet.id }})</h5>
+                </div>
+                <div class="card-body">
+                    {% if pallet.ordenes %}
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>ID Orden</th>
+                                    <th>Serial</th>
+                                    <th>Nro Pallet</th>
+                                    <th>Modelo</th>
+                                    <th>Marca</th>
+                                    <th>Destino</th>
+                                    <th>Estado</th>
+                                    <th>Fecha Despacho</th>
+                                    <th>Usuario Despachó</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for orden in pallet.ordenes %}
+                                    <tr>
+                                        <td>{{ orden.id }}</td>
+                                        <td>{{ orden.numero_serie }}</td>
+                                        <td>{{ pallet.nro_pallet }}</td>
+                                        <td>{{ orden.modelo }}</td>
+                                        <td>{{ orden.marca }}</td>
+                                        <td><span class="badge-estado bg-{{ pallet.destino|lower|replace_chars:' :-' }}">{{ pallet.destino }}</span></td>
+                                        <td><span class="badge-estado bg-despachado">Despachado</span></td>
+                                        <td>{{ pallet.fecha_despacho|date:"d/m/Y H:i"|default:"N/A" }}</td>
+                                        <td>{{ pallet.usuario_despacho|default:"N/A" }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% endif %}
+                </div>
+            </div>
+        {% endfor %}
+    {% endif %}
+</div>
+{% endblock %}

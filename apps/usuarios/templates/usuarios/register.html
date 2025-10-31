@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block content %}
+	<div class="container d-flex justify-content-center align-items-center" style="min-height: 75vh;">
+	<div class="card shadow p-4 rounded" style="min-width: 400px; max-width: 500px; width: 100%;">
+		<h3 class="text-center mb-4">Registra Usuario</h3>
+			<form action="{% url 'usuarios:register' %}" class="" method="post">
+				{% csrf_token %}
+				{{ form.as_p }}
+				
+				
+				{% for field in registration_form %}
+				<p>
+				{% for error in field.errors %}
+				<p style="color: red">{{ error }}</p>
+				{% endfor %}
+				</p>
+				{% endfor %}
+				{% if registration_form.non_field_errors %}
+				<div style="color: red">
+					<p>{{registration_form.non_field_errors}}</p>
+				</div>
+
+				{% endif %}
+
+				<div class="d-flex justify-content-md-between">
+					<a href="{% url 'usuarios:login' %}" class="btn btn-lg btn-danger btn-block" type="submit">Cancelar</a>
+					<button class="btn btn-lg btn-primary btn-block" type="submit">Register</button>
+				</div>
+
+
+
+		
+			</form>
+  </div>
+</div>
+{% endblock %}
+
+

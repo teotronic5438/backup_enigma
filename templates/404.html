@@ -1,0 +1,14 @@
+<!-- templates/home.html -->
+{% extends "base.html" %}
+
+{% block title %}Inicio - Mi App{% endblock %}
+
+{% block content %}
+    <div class="d-flex justify-content-between align-items-center">
+        <h2>Pagina no encontrada</h2>
+    </div>
+    <div class="alert alert-warning" role="alert">
+        <p>Lo sentimos, la página que estás buscando no existe.</p>
+        <p>Por favor, verifica la URL o vuelve a la <a href="{{ url 'dashboard' }}">página de inicio</a>.</p>
+    </div>
+{% endblock %}

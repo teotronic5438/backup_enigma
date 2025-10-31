@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block title %}Stock - Enigma ERP{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 mt-3">
+
+    <!-- Encabezado principal -->
+    <div class="d-flex align-items-center mb-4">
+        <i class="bi bi-box-seam fs-3 text-primary me-2"></i>
+        <h3 class="fw-bold text-primary m-0">Gestión de Stock</h3>
+    </div>
+
+        <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb bg-light rounded p-2">
+            <li class="breadcrumb-item">
+                <i class="bi bi-house-door"></i> Inicio
+            </li>
+            <li class="breadcrumb-item text-primary" aria-current="page">Stock</li>
+        </ol>
+    </nav>
+
+    <!-- Formulario de búsqueda -->
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3 align-items-center">
+                <div class="col-md-4 col-sm-6">
+                    <input type="text" name="busqueda" class="form-control" 
+                           placeholder="Buscar producto..." value="{{ request.GET.busqueda }}">
+                </div>
+
+                <div class="col-md-3 col-sm-6">
+                    <select name="filtro" class="form-select">
+                        <option value="">Filtrar por...</option>
+                        <option value="marca" {% if request.GET.filtro == "marca" %}selected{% endif %}>Marca</option>
+                        <option value="modelo" {% if request.GET.filtro == "modelo" %}selected{% endif %}>Modelo</option>
+                        <option value="deposito" {% if request.GET.filtro == "deposito" %}selected{% endif %}>Depósito</option>
+                        <option value="ubicacion" {% if request.GET.filtro == "ubicacion" %}selected{% endif %}>Ubicación</option>
+                        <option value="cantidad" {% if request.GET.filtro == "cantidad" %}selected{% endif %}>Cantidad</option>
+                    </select>
+                </div>
+
+                <div class="col-md-5 col-sm-12 d-flex gap-2 justify-content-md-start justify-content-sm-center">
+                    <button type="submit" class="btn btn-primary shadow-sm">
+                        <i class="bi bi-search me-1"></i> Buscar
+                    </button>
+                    <a href="{% url 'stock' %}" class="btn btn-secondary shadow-sm">
+                        <i class="bi bi-x-circle me-1"></i> Limpiar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Tabla de stock -->
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-0">
+            <table class="table table-bordered table-hover m-0 align-middle text-center">
+                <thead class="table-primary">
+                    <tr>
+                        <th>ID</th>
+                        <th>Marca</th>
+                        <th>Modelo</th>
+                        <th>Depósito</th>
+                        <th>Cantidad</th>
+                        <th>Ubicación</th>
+                        <th>Precio Unitario</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for producto in productos %}
+                    <tr>
+                        <td>{{ producto.id }}</td>
+                        <td>{{ producto.producto_id.marca }}</td>
+                        <td>{{ producto.producto_id.modelo }}</td>
+                        <td>{{ producto.deposito_id.nombre }}</td>
+                        <td>{{ producto.cantidad_total }}</td>
+                        <td>{{ producto.ubicacion }}</td>
+                        <td>${{ producto.precio_unitario }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-muted py-4">No se encontraron productos.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}Remitos{% endblock %}
+
+{% block content %}
+<div>
+    <h2>Formulario de Remito</h2>
+
+    <p><strong>Número:</strong> {{ remito.numero_remito }}</p>
+    <p><strong>Número de viaje:</strong> {{ remito.numero_viaje }}</p>
+    <p><strong>Número de transporte:</strong> {{ remito.detalle_transporte }}</p>
+    <p><strong>Depósito:</strong> {{ remito.deposito_id.nombre }}</p>
+    <p><strong>Fecha de ingreso:</strong> {{ remito.fecha_ingreso }}</p>
+    <p><strong>Aprobado:</strong> {{ remito.aprobado|yesno:"Sí,No" }}</p>
+
+    <h2>Productos asociados</h2>
+    <table class="ingresos-table">
+        <thead>
+            <tr>
+                <th>Marca</th>
+                <th>Modelo</th>
+                <th>Cantidad</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for rp in productos_relacionados %}
+                <tr>
+                    <td>{{ rp.producto_id.marca }}</td>
+                    <td>{{ rp.producto_id.modelo }}</td>
+                    <td>{{ rp.cantidad }}</td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="3">No hay productos asociados.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="text-end">
+  <a class="btn btn-outline-primary" href="{% url 'ingresos_historial' %}">Volver al Historial</a>
+</div>
+
+
+{% endblock %}

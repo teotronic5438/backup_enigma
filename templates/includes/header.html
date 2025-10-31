@@ -1,0 +1,70 @@
+{% load static %}
+<nav class="navbar navbar-expand-lg shadow-sm navbar-gradient">
+  <div class="container-fluid">
+    <!-- LOGO / BRAND -->
+    <a class="navbar-brand d-flex align-items-center" href="{% url 'core:dashboard' %}">
+      <div class="card-header p-0 bg-transparent border-0">
+        <img class="logo_form" src="{% static 'img/enigmaLogoNuevo.png' %}" alt="Enigma Logo">
+      </div>
+    </a>
+
+    <!-- DIV CENTRAL PARA CINTA DE TIPOS DE CAMBIO -->
+    <div class="mx-auto text-center d-none d-lg-block">
+        <div class="ticker-container text-white py-1 px-2 rounded">
+            <div class="ticker" id="ticker-api">
+                Cargando tipos de cambio...
+            </div>
+        </div>
+    </div>
+
+    <!-- BOTONES USUARIO / LOGIN -->
+    <div class="d-flex ms-auto">
+      {% if user.is_authenticated %}
+        <div class="dropdown">
+          <a class="btn btn-primary" href="#" role="button" id="dropdownUser" data-bs-toggle="dropdown" aria-expanded="false">
+            {{ user.username }} (rol {{ user.rol }})
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownUser">
+            <li>
+              <form action="{% url 'usuarios:logout' %}" method="post" class="d-inline">
+                {% csrf_token %}
+                <button type="submit" class="dropdown-item">Cerrar sesión</button>
+              </form>
+            </li>
+          </ul>
+        </div>
+      {% else %}
+        <a href="{% url 'usuarios:register' %}" class="btn btn-outline-primary me-2">Registrarse</a>
+        <a href="{% url 'usuarios:login' %}" class="btn btn-outline-success">Login</a>
+      {% endif %}
+    </div>
+  </div>
+</nav>
+
+<!-- SCRIPT PARA CARGAR INFO DE API EN EL DIV CENTRAL -->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    fetch('https://dolarapi.com/v1/dolares')
+        .then(response => response.json())
+        .then(data => {
+            const ticker = document.getElementById('ticker-api');
+            if (data && Array.isArray(data)) {
+                const items = data.map(item => {
+                    return `<span class="ticker-item">
+                                ${item.nombre}: Compra $${item.compra} / Venta $${item.venta}
+                            </span>`;
+                }).join('');
+
+                // duplicamos el contenido para loop continuo
+                ticker.innerHTML = items + items;
+            } else {
+                ticker.innerHTML = 'Sin información disponible';
+            }
+        })
+        .catch(error => {
+            const ticker = document.getElementById('ticker-api');
+            ticker.innerHTML = 'Error cargando info';
+            console.error('Error API:', error);
+        });
+});
+</script>

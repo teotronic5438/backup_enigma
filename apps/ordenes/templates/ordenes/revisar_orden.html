@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% block title %}Orden detallada{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Revisar Orden #{{ object.id }}</h2>
+    {% if equipo_form.errors %}
+        <div class="alert alert-danger p-1">
+            <ul class="mb-0">
+                {% for field, errors in equipo_form.errors.items %}
+                    {% for error in errors %}
+                        <li><strong>{{ field|capfirst }}:</strong> {{ error }}</li>
+                    {% endfor %}
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
+    <form method="post" class="needs-validation" novalidate>
+        {% csrf_token %}
+
+        <div class="mb-3 row">
+            <label class="col-sm-2 col-form-label fw-bold">Remito:</label>
+            <div class="col-sm-10 pt-2">
+                {{ object.remito_id }}
+            </div>
+        </div>
+
+        <div class="mb-3 row">
+            <label class="col-sm-2 col-form-label fw-bold">Equipo:</label>
+            <div class="col-sm-10 pt-2">
+                {{ object.equipo_id.producto_id.modelo }}
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label for="{{ equipo_form.numero_serie.id_for_label }}" class="form-label fw-bold">
+                Número de Serie
+            </label>
+            {% render_field equipo_form.numero_serie class="form-control" placeholder="Ingresar serie del equipo" %}
+        </div>
+
+
+        <div class="mb-3">
+            <label for="{{ form.falla_detectada.id_for_label }}" class="form-label fw-bold">
+                {{ form.falla_detectada.label }}:
+            </label>
+            <div>
+                {% render_field form.falla_detectada class="form-control" placeholder="Describe la falla" %}
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label for="{{ form.reparacion.id_for_label }}" class="form-label fw-bold">
+                {{ form.reparacion.label }}:
+            </label>
+
+            <div>
+                {% render_field form.reparacion class="form-control" placeholder="Describe la reparacion efectuada" %}
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label for="{{ form.destino.id_for_label }}" class="form-label fw-bold">
+                {{ form.destino.label }}
+            </label>
+            {% render_field form.destino class="form-select" %}
+        </div>
+        <!-- 
+        <div class="text-end">
+            <button type="submit" class="btn btn-success">Guardar Cambios</button>
+        </div> -->
+        {% comment %} <div class="text-end">
+            <a href="{{ request.META.HTTP_REFERER }}" class="btn btn-danger me-2">Cancelar</a>
+            <button type="submit" class="btn btn-success">Guardar Cambios</button>
+        </div> {% endcomment %}
+
+        <div class="text-end mt-3">
+            <a href="{{ request.META.HTTP_REFERER }}" class="btn btn-danger me-2">Cancelar</a>
+            <button type="submit" class="btn btn-success me-2">Guardar Cambios</button>
+
+            <!-- Botón imprimir etiqueta -->
+            <form method="post" action="{% url 'impresora:imprimir_etiqueta' %}" class="d-inline">
+                {% csrf_token %}
+                <input type="hidden" name="modelo" value="{{ object.equipo_id.producto_id.modelo }}">
+                <input type="hidden" name="marca" value="{{ object.equipo_id.producto_id.marca }}">
+                <input type="hidden" name="serial" value="{{ equipo_form.numero_serie.value }}">
+                <button type="submit" class="btn btn-primary">
+                    🖨 Imprimir Etiqueta
+                </button>
+            </form>
+        </div>
+
+
+    </form>
+</div>
+{% endblock %}
+

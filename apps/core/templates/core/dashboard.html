@@ -1,0 +1,58 @@
+<!-- templates/home.html -->
+
+{% extends "base.html" %} 
+
+
+{% block content %}
+
+    {% if messages %}  <!-- aca va a aparecer el mensaje de Registro exitoso-->
+        {% for message in messages %}
+          <div class="alert alert-success">
+              {{ message }}
+          </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="container-fluid">
+        <h2>Bienvenido al panel principal</h2>
+
+        <div class="chart-grid">
+            <div class="chart-item">
+                <h2>Total de Ordenes</h2>
+                <canvas id="totalOrdenesActivasChart"></canvas>
+            </div>
+
+            <div class="chart-item">
+                <h2>Pendientes</h2>
+                <canvas id="pendientesRevisionActivasChart"></canvas>
+            </div>
+
+            <div class="chart-item">
+                <h2>Revisadas</h2>
+                <canvas id="revisadasPalletizadasActivasChart"></canvas>
+            </div>
+        </div>
+
+        <hr>
+
+        <div class="chart-grid">
+            <div class="chart-item">
+                <h2>Nuevo Activas</h2>
+                <canvas id="destinoNuevoActivasChart"></canvas>
+            </div>
+
+            <div class="chart-item">
+                <h2>Avería Activas</h2>
+                <canvas id="destinoAveriaActivasChart"></canvas>
+            </div>
+
+            <div class="chart-item">
+                <h2>Scrap Activas</h2>
+                <canvas id="destinoDestruccionActivasChart"></canvas>
+            </div>
+        </div>
+        <!-- <p>{ { datos_grafico_destino_json } }</p>
+        <p>{ { datos_grafico_tipo_json } }</p> -->
+    </div>
+
+{% endblock %}

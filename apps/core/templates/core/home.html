@@ -1,0 +1,22 @@
+<!-- templates/home.html -->
+
+{% extends "base.html" %} 
+
+
+{% block content %}
+    
+
+   
+  <div class="container">
+
+    {% if messages %}  <!-- aca va a aparecer el mensaje de Registro exitoso-->
+        {% for message in messages %}
+          <div class="alert alert-success">
+              {{ message }}
+          </div>
+        {% endfor %}
+    {% endif %}
+
+    <h2>Bienvenido al panel principal</h2>
+    <p>Este es el contenido principal que se muestra en la página de inicio.</p>
+{% endblock %}
