@@ -166,8 +166,8 @@ def generar_codigo_epl(marca, modelo, serial):
     # Reset e inicialización
     epl_commands.append("\n")  # Línea en blanco inicial
     epl_commands.append("N")   # Clear image buffer
-    epl_commands.append("q609")  # Set width (2.5cm ≈ 98 dots, pero usamos 609 para TLP2844)
-    epl_commands.append("Q203,1")  # Set length (5cm ≈ 203 dots) + 1 para gap
+    epl_commands.append("q812")  # Set width (2.5cm ≈ 98 dots, pero usamos 609 para TLP2844)
+    epl_commands.append("Q203")  # Set length (5cm ≈ 203 dots) + 1 para gap
     epl_commands.append("S2")  # Set media sensing to gap
     
     # PRIMERA ETIQUETA

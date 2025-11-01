@@ -267,7 +267,7 @@
                 btnEnviarDespachoPrincipal.addEventListener('click', function(event) {
                     const selectedOrders = document.querySelectorAll('input[name="orden_ids"]:checked');
                     if (selectedOrders.length === 0) {
-                        alert('Por favor, selecciona al menos una orden para palletizar.');
+                        // alert('Por favor, selecciona al menos una orden para palletizar.');
                         event.preventDefault();
                         return;
                     }
