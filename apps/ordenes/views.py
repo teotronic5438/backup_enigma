@@ -185,7 +185,7 @@ class RevisarOrdenUpdateView(LoginRequiredMixin, UpdateView):
 
 class RevisarOrdenUpdateView(LoginRequiredMixin, UpdateView):
     model = Ordenes
-    form_class = OrdenForm  # <-- Usamos nuestro form personalizado
+    form_class = OrdenForm
     template_name = 'ordenes/revisar_orden.html'
     success_url = reverse_lazy('ordenes_pendientes')
 
@@ -207,7 +207,6 @@ class RevisarOrdenUpdateView(LoginRequiredMixin, UpdateView):
 
         if form.is_valid() and equipo_form.is_valid():
             orden = form.save(commit=False)
-            orden._request = self.request
             orden.estado_id, _ = Estados.objects.get_or_create(nombre_estado='Revisado')
             orden.fecha_revision = now()
             orden.save()
@@ -217,7 +216,6 @@ class RevisarOrdenUpdateView(LoginRequiredMixin, UpdateView):
             return self.render_to_response(
                 self.get_context_data(form=form, equipo_form=equipo_form)
             )
-
 
 
 # creando solo ordenes activas de prueba

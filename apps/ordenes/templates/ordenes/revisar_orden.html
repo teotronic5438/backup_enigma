@@ -6,6 +6,19 @@
 {% block content %}
 <div class="container mt-4">
     <h2 class="mb-4">Revisar Orden #{{ object.id }}</h2>
+    
+    {% if messages %}
+        <div class="mt-3">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert" style="max-width: 400px; margin-left: auto;">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+            </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+
     {% if equipo_form.errors %}
         <div class="alert alert-danger p-1">
             <ul class="mb-0">
@@ -72,29 +85,51 @@
         <div class="text-end">
             <button type="submit" class="btn btn-success">Guardar Cambios</button>
         </div> -->
-        {% comment %} <div class="text-end">
+        <div class="text-end">
             <a href="{{ request.META.HTTP_REFERER }}" class="btn btn-danger me-2">Cancelar</a>
             <button type="submit" class="btn btn-success">Guardar Cambios</button>
-        </div> {% endcomment %}
-
-        <div class="text-end mt-3">
-            <a href="{{ request.META.HTTP_REFERER }}" class="btn btn-danger me-2">Cancelar</a>
-            <button type="submit" class="btn btn-success me-2">Guardar Cambios</button>
-
-            <!-- Botón imprimir etiqueta -->
-            <form method="post" action="{% url 'impresora:imprimir_etiqueta' %}" class="d-inline">
-                {% csrf_token %}
-                <input type="hidden" name="modelo" value="{{ object.equipo_id.producto_id.modelo }}">
-                <input type="hidden" name="marca" value="{{ object.equipo_id.producto_id.marca }}">
-                <input type="hidden" name="serial" value="{{ equipo_form.numero_serie.value }}">
-                <button type="submit" class="btn btn-primary">
-                    🖨 Imprimir Etiqueta
-                </button>
-            </form>
         </div>
-
-
     </form>
+
+    <!-- 🔹 Form separado para imprimir -->
+    <form method="post" action="{% url 'impresora:imprimir_etiqueta' %}" class="text-end mt-3" id="form-imprimir">
+        {% csrf_token %}
+        <input type="hidden" name="modelo" value="{{ object.equipo_id.producto_id.modelo }}">
+        <input type="hidden" name="marca" value="{{ object.equipo_id.producto_id.marca }}">
+        <input type="hidden" name="serial" id="serial-hidden" value="{{ object.equipo_id.numero_serie }}">
+        <button type="submit" class="btn btn-secondary">
+            <i class="bi bi-printer"></i> Imprimir Etiqueta Doble (2.5x5cm)
+        </button>
+    </form>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const formImprimir = document.getElementById('form-imprimir');
+            const inputSerial = document.getElementById('serial-hidden');
+            const inputNumeroSerie = document.getElementById('{{ equipo_form.numero_serie.id_for_label }}');
+
+            formImprimir.addEventListener('submit', function(e) {
+                // Actualiza el hidden con lo que el usuario escribió
+                const currentSerial = inputNumeroSerie.value.trim();
+                
+                if (!currentSerial) {
+                    e.preventDefault();
+                    alert('❌ Por favor, ingresa el número de serie antes de imprimir.');
+                    inputNumeroSerie.focus();
+                    return;
+                }
+                
+                inputSerial.value = currentSerial;
+                
+                // Opcional: Mostrar mensaje de confirmación
+                if (!confirm('¿Imprimir etiqueta doble con los datos actuales?')) {
+                    e.preventDefault();
+                }
+            });
+        });
+    </script>
+
+
 </div>
 {% endblock %}
 
