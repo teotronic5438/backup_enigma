@@ -157,7 +157,7 @@ def generar_codigo_epl(marca, modelo, serial):
     
     # Limitar longitud de textos
     marca = marca[:12]
-    modelo = modelo[:10] 
+    modelo = modelo[:12] 
     serial = serial[:15]
     
     # Comandos EPL más básicos y estándar
@@ -167,7 +167,7 @@ def generar_codigo_epl(marca, modelo, serial):
     epl_commands.append("\n")  # Línea en blanco inicial
     epl_commands.append("N")   # Clear image buffer
     epl_commands.append("q812")  # Set width (2.5cm ≈ 98 dots, pero usamos 609 para TLP2844)
-    epl_commands.append("Q203")  # Set length (5cm ≈ 203 dots) + 1 para gap
+    epl_commands.append("Q203,24")  # Set length (5cm ≈ 203 dots) + 1 para gap
     epl_commands.append("S2")  # Set media sensing to gap
     
     # PRIMERA ETIQUETA
@@ -178,17 +178,26 @@ def generar_codigo_epl(marca, modelo, serial):
     epl_commands.append(f'A20,45,0,3,1,1,N,"{modelo}"')
     
     # Texto - Serial
-    epl_commands.append(f'A20,70,0,3,1,1,N,"S:{serial}"')
+    # epl_commands.append(f'A20,70,0,3,1,1,N,"S:{serial}"')
     
     # Código de barras Code 128 - más estándar
-    epl_commands.append(f'B20,95,0,3,3,6,50,B,"{serial}"')
+    # epl_commands.append(f'B20,95,0,3,3,6,50,B,"{serial}"')
+    epl_commands.append(f'B20,70,0,3,3,6,50,B,"{serial}"')
+
+    epl_commands.append(f'A280,135,0,3,1,1,N,"ENIGMA"')
+
+
     
     # SEGUNDA ETIQUETA (offset de 150 puntos)
-    epl_commands.append(f'A20,170,0,3,1,1,N,"{marca}"')
-    epl_commands.append(f'A20,195,0,3,1,1,N,"{modelo}"')
-    epl_commands.append(f'A20,220,0,3,1,1,N,"S:{serial}"')
-    epl_commands.append(f'B20,245,0,3,3,6,50,B,"{serial}"')
-    
+    epl_commands.append(f'A446,20,0,3,1,1,N,"{marca}"')
+    epl_commands.append(f'A446,45,0,3,1,1,N,"{modelo}"')
+    # epl_commands.append(f'A446,70,3,1,1,N,"S:{serial}"')
+    # epl_commands.append(f'B446,95,0,3,3,6,50,B,"{serial}"')
+    epl_commands.append(f'B446,70,0,3,3,6,50,B,"{serial}"')
+
+
+    epl_commands.append(f'A706,135,0,3,1,1,N,"ENIGMA"')
+
     # Imprimir
     epl_commands.append("P1")  # Print 1 copy
     
