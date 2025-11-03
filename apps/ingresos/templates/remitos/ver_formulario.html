@@ -1,44 +1,97 @@
 {% extends "base.html" %}
 
-{% block title %}Remitos{% endblock %}
+{% block title %}Detalle de Remito{% endblock %}
 
 {% block content %}
-<div>
-    <h2>Formulario de Remito</h2>
+<div class="container-fluid px-4 mt-3">
 
-    <p><strong>Número:</strong> {{ remito.numero_remito }}</p>
-    <p><strong>Número de viaje:</strong> {{ remito.numero_viaje }}</p>
-    <p><strong>Número de transporte:</strong> {{ remito.detalle_transporte }}</p>
-    <p><strong>Depósito:</strong> {{ remito.deposito_id.nombre }}</p>
-    <p><strong>Fecha de ingreso:</strong> {{ remito.fecha_ingreso }}</p>
-    <p><strong>Aprobado:</strong> {{ remito.aprobado|yesno:"Sí,No" }}</p>
+    <!-- 🔹 Encabezado principal -->
+    <div class="d-flex align-items-center mb-4">
+        <i class="bi bi-receipt fs-3 text-primary me-2"></i>
+        <h3 class="fw-bold text-primary m-0">Remito ENIGMA #{{ remito.numero_remito }}</h3>
+    </div>
 
-    <h2>Productos asociados</h2>
-    <table class="ingresos-table">
-        <thead>
-            <tr>
-                <th>Marca</th>
-                <th>Modelo</th>
-                <th>Cantidad</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for rp in productos_relacionados %}
-                <tr>
-                    <td>{{ rp.producto_id.marca }}</td>
-                    <td>{{ rp.producto_id.modelo }}</td>
-                    <td>{{ rp.cantidad }}</td>
-                </tr>
-            {% empty %}
-                <tr><td colspan="3">No hay productos asociados.</td></tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb bg-light rounded p-2">
+            <li class="breadcrumb-item">
+                <i class="bi bi-house-door"></i> Inicio
+            </li>
+            <li class="breadcrumb-item">
+                Ingresos
+            </li>
+            <li class="breadcrumb-item text-primary" aria-current="page">Detalle de Remito</li>
+        </ol>
+    </nav>
+
+    <!-- Información general del remito -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-primary text-white fw-bold">Información del Remito</div>
+                <div class="card-body">
+                    <div class="row">
+                        <!-- Columna izquierda -->
+                        <div class="col-md-6">
+                            <p><strong>Número:</strong> {{ remito.numero_remito|default:"-" }}</p>
+                            <p><strong>Número de viaje:</strong> {{ remito.numero_viaje|default:"-" }}</p>
+                            <p><strong>Detalle de transporte:</strong> {{ remito.detalle_transporte|default:"-" }}</p>
+                        </div>
+
+                        <!-- Columna derecha -->
+                        <div class="col-md-6">
+                            <p><strong>Depósito:</strong> {{ remito.deposito_id.nombre|default:"-" }}</p>
+                            <p><strong>Fecha de ingreso:</strong> {{ remito.fecha_ingreso|date:"d/m/Y" }} {{ remito.fecha_ingreso|time:"H:i" }}</p>
+                            <p><strong>Aprobado:</strong> 
+                                {% if remito.aprobado %}
+                                    <span class="badge bg-success px-3 py-2">Sí</span>
+                                {% else %}
+                                    <span class="badge bg-secondary px-3 py-2">No</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Productos asociados -->
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-header bg-primary text-white fw-bold">Productos Asociados</div>
+        <div class="card-body p-0">
+            <table class="table table-bordered table-hover m-0 align-middle text-center">
+                <thead class="table-primary">
+                    <tr>
+                        <th>Marca</th>
+                        <th>Modelo</th>
+                        <th>Cantidad</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for rp in productos_relacionados %}
+                        <tr>
+                            <td>{{ rp.producto_id.marca|default:"-" }}</td>
+                            <td>{{ rp.producto_id.modelo|default:"-" }}</td>
+                            <td>{{ rp.cantidad|default:"-" }}</td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="3" class="text-muted py-4">No hay productos asociados.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Botón de regresar -->
+    <div class="mb-3 text-end">
+        <a class="btn btn-secondary shadow-sm" href="{% url 'ingresos_historial' %}">
+            <i class="bi bi-arrow-left-circle me-2"></i> Volver al Historial
+        </a>
+    </div>
+
 </div>
-
-<div class="text-end">
-  <a class="btn btn-outline-primary" href="{% url 'ingresos_historial' %}">Volver al Historial</a>
-</div>
-
-
 {% endblock %}

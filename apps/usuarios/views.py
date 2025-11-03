@@ -51,7 +51,7 @@ class UsuarioLoginView(LoginView):
 #     return render(request, 'usuarios/login.html', {'form': form})
 
     
-class RegistrarUsuario(CreateView):
+class RegistrarUsuario(LoginRequiredMixin, CreateView):
       model = Usuarios
       form_class = FormularioUsuario
       template_name = 'usuarios/register.html'

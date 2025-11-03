@@ -127,14 +127,26 @@
       </a>
 
       <ul class="collapse list-unstyled ps-3" id="submenuConfiguracion" data-menu="submenuConfiguracion">
+
+        {% if request.user.rol.nombre == "Supervisor" or request.user.rol.nombre == "Admin"  %}
+        <li>
+          <a class="nav-link text-white {% if request.resolver_match.url_name == 'register' %}active{% endif %}"
+            href="{% url 'usuarios:register' %}">
+            <span class="me-2">&#128100;</span> Agregar Usuario
+          </a>
+        </li>
+        {% endif %}
+
         <li>
           <a class="nav-link text-white {% if request.resolver_match.url_name == 'configuracion' %}active{% endif %}"
             href="{% url 'impresora:configuracion' %}">
             <span class="me-2">&#128424;</span> Impresora
           </a>
         </li>
+
       </ul>
     </li>
+
 
 
   </ul>
