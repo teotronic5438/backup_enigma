@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+
+{% block title %}Detalle de Orden{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 mt-3">
+
+    <!-- 🔹 Encabezado principal -->
+    <div class="d-flex align-items-center mb-4">
+        <i class="bi bi-card-list fs-3 text-primary me-2"></i>
+        <h3 class="fw-bold text-primary m-0">Detalle de Orden ENIGMA-A{{ orden.id }}</h3>
+    </div>
+
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb bg-light rounded p-2">
+            <li class="breadcrumb-item">
+                <i class="bi bi-house-door"></i> Inicio
+            </li>
+            <li class="breadcrumb-item">
+                Órdenes
+            </li>
+            <li class="breadcrumb-item">
+                Avanzadas
+            </li>
+            <li class="breadcrumb-item text-primary" aria-current="page">Detalle</li>
+        </ol>
+    </nav>
+
+    <!-- Información general de la orden -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-primary text-white fw-bold">Información de la Orden</div>
+                <div class="card-body">
+                    <p><strong>Modelo:</strong> {{ orden.equipo_id.producto_id.modelo|default:"-" }}</p>
+                    <p><strong>Marca:</strong> {{ orden.equipo_id.producto_id.marca|default:"-" }}</p>
+                    <p><strong>Nº de Serie:</strong> {{ orden.equipo_id.numero_serie|default:"-" }}</p>
+                    <p><strong>Destino:</strong>
+                        {% if orden.destino %}
+                            {{ orden.destino.nombre_destino }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </p>
+                    <p><strong>Palletizado:</strong> {% if orden.equipo_palletizado %}Sí{% else %}No{% endif %}</p>
+                    <p><strong>Remito Origen:</strong> 
+                        {% if orden.remito_id %}
+                            {{ orden.remito_id.numero_remito }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </p>
+
+                    <p><strong>Estado:</strong> 
+                        {% if orden.estado_id.nombre_estado == "Pendiente" %}
+                            <span class="badge bg-warning text-dark px-3 py-2">Pendiente</span>
+                        {% elif orden.estado_id.nombre_estado == "Revisado" %}
+                            <span class="badge bg-success px-3 py-2">Revisado</span>
+                        {% elif orden.estado_id.nombre_estado == "Palletizado" %}
+                            <span class="badge bg-primary px-3 py-2">Palletizado</span>
+                        {% elif orden.estado_id.nombre_estado == "Despachado" %}
+                            <span class="badge bg-secondary px-3 py-2">Despachado</span>
+                        {% else %}
+                            <span class="badge bg-light text-dark px-3 py-2">{{ orden.estado_id.nombre_estado|default:"-" }}</span>
+                        {% endif %}
+                    </p>
+                    <p><strong>Creado por:</strong>
+                        {% if orden.usuario %}
+                            {{ orden.usuario.username }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </p>
+                    <p><strong>Revisado por:</strong>
+                        {% if orden.editado_por %}
+                            {{ orden.editado_por.username }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </p>
+
+                    <p><strong>Palletizado por:</strong>
+                        {% if orden.palletizado_por %}
+                            {{ orden.palletizado_por.username }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </p>
+                    <p><strong>Fecha de Creación:</strong> {{ orden.fecha_creacion|date:"d/m/Y H:i" }}</p>
+                    <p><strong>Fecha de Revisión:</strong> {% if orden.fecha_revision %}{{ orden.fecha_revision|date:"d/m/Y H:i" }}{% else %}-{% endif %}</p>
+                    <p><strong>Tiempo Transcurrido:</strong> 
+                        {% with orden.fecha_creacion|timesince:now as tiempo %}
+                            {{ tiempo }}
+                        {% endwith %}
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Información adicional del equipo -->
+        <div class="col-md-6">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-primary text-white fw-bold">Detalles del Equipo</div>
+                <div class="card-body">
+                    <p><strong>Falla detectada:</strong> {{ orden.falla_detectada|default:"-" }}</p>
+                    <p><strong>Reparación realizada:</strong> {{ orden.reparacion|default:"-" }}</p>
+                    <p><strong>Notas adicionales:</strong> {{ orden.notas_adicionales|default:"-" }}</p>
+                    <p><strong>Observaciones de destino:</strong> {{ orden.observaciones_destino|default:"-" }}</p>
+                    <p><strong>Otros datos relevantes:</strong> {{ orden.datos_relevantes|default:"-" }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Botón de regresar -->
+    <div class="mb-3">
+        <a href="{% url 'ordenes_activas' %}" class="btn btn-secondary shadow-sm">
+            <i class="bi bi-arrow-left-circle me-2"></i> Volver a Órdenes Activas
+        </a>
+    </div>
+
+</div>
+{% endblock %}

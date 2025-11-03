@@ -88,94 +88,123 @@
 
     <!-- ✅ JS -->
     <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const formOrden = document.getElementById('form-orden');
-        const btnGuardar = document.getElementById('btn-guardar');
-        const btnImprimir = document.getElementById('btn-imprimir');
-        const formImprimir = document.getElementById('form-imprimir');
-        const inputSerial = document.getElementById('serial-hidden');
-        const inputNumeroSerie = document.getElementById('{{ equipo_form.numero_serie.id_for_label }}');
-        const falla = document.getElementById('{{ form.falla_detectada.id_for_label }}');
-        const reparacion = document.getElementById('{{ form.reparacion.id_for_label }}');
-        const destino = document.getElementById('{{ form.destino.id_for_label }}');
+        document.addEventListener('DOMContentLoaded', function() {
+            const formOrden = document.getElementById('form-orden');
+            const btnGuardar = document.getElementById('btn-guardar');
+            const btnImprimir = document.getElementById('btn-imprimir');
+            const formImprimir = document.getElementById('form-imprimir');
+            const inputSerial = document.getElementById('serial-hidden');
+            const inputNumeroSerie = document.getElementById('{{ equipo_form.numero_serie.id_for_label }}');
+            const falla = document.getElementById('{{ form.falla_detectada.id_for_label }}');
+            const reparacion = document.getElementById('{{ form.reparacion.id_for_label }}');
+            const destino = document.getElementById('{{ form.destino.id_for_label }}');
 
-        // 🚫 Bloquea el enter o pistola de código de barras de enviar el form
-        formOrden.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-            }
-        });
-
-        // ✅ Validación antes de guardar
-        btnGuardar.addEventListener('click', function(e) {
-            e.preventDefault();
-            const errores = [];
-            if (!inputNumeroSerie.value.trim()) errores.push("Número de serie");
-            if (!falla.value.trim()) errores.push("Falla detectada");
-            if (!reparacion.value.trim()) errores.push("Reparación");
-            if (!destino.value) errores.push("Destino");
-
-            if (errores.length > 0) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Campos incompletos',
-                    html: 'Faltan completar los siguientes campos:<br><br><b>' + errores.join('<br>') + '</b>',
-                    confirmButtonText: 'Entendido',
-                    confirmButtonColor: '#f0ad4e'
-                });
-            } else {
-                Swal.fire({
-                    title: '¿Guardar los cambios?',
-                    text: 'Se actualizarán los datos de la orden.',
-                    icon: 'question',
-                    showCancelButton: true,
-                    confirmButtonText: 'Sí, guardar',
-                    cancelButtonText: 'Cancelar',
-                    confirmButtonColor: '#198754',
-                    cancelButtonColor: '#d33'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        formOrden.submit();
-                    }
-                });
-            }
-        });
-
-        // ✅ Manejo de impresión con confirmación
-        btnImprimir.addEventListener('click', function() {
-            const currentSerial = inputNumeroSerie.value.trim();
-
-            if (!currentSerial) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Número de serie faltante',
-                    text: 'Por favor, ingresa el número de serie antes de imprimir.',
-                    confirmButtonText: 'Entendido',
-                    confirmButtonColor: '#d33'
-                }).then(() => {
-                    inputNumeroSerie.focus();
-                });
-                return;
-            }
-
-            inputSerial.value = currentSerial;
-
-            Swal.fire({
-                title: '¿Imprimir etiqueta doble?',
-                text: 'Se imprimirá con los datos actuales del equipo.',
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonText: 'Sí, imprimir',
-                cancelButtonText: 'Cancelar',
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    formImprimir.submit();
+            // 🚫 Bloquea el enter o pistola de código de barras de enviar el form
+            formOrden.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
                 }
             });
+
+            // ✅ Validación antes de guardar
+            btnGuardar.addEventListener('click', function(e) {
+                e.preventDefault();
+                const errores = [];
+                if (!inputNumeroSerie.value.trim()) errores.push("Número de serie");
+                if (!falla.value.trim()) errores.push("Falla detectada");
+                if (!reparacion.value.trim()) errores.push("Reparación");
+                if (!destino.value) errores.push("Destino");
+
+                if (errores.length > 0) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Campos incompletos',
+                        html: 'Faltan completar los siguientes campos:<br><br><b>' + errores.join('<br>') + '</b>',
+                        confirmButtonText: 'Entendido',
+                        confirmButtonColor: '#f0ad4e'
+                    });
+                } else {
+                    Swal.fire({
+                        title: '¿Guardar los cambios?',
+                        text: 'Se actualizarán los datos de la orden.',
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonText: 'Sí, guardar',
+                        cancelButtonText: 'Cancelar',
+                        confirmButtonColor: '#198754',
+                        cancelButtonColor: '#d33'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            formOrden.submit();
+                        }
+                    });
+                }
+            });
+
+            // ✅ Manejo de impresión con confirmación
+            btnImprimir.addEventListener('click', function() {
+                const currentSerial = inputNumeroSerie.value.trim();
+
+                if (!currentSerial) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Número de serie faltante',
+                        text: 'Por favor, ingresa el número de serie antes de imprimir.',
+                        confirmButtonText: 'Entendido',
+                        confirmButtonColor: '#d33'
+                    }).then(() => inputNumeroSerie.focus());
+                    return;
+                }
+
+                // 1️⃣ Guardar el serial en la base de datos antes de imprimir
+                fetch("{% url 'actualizar_serial' object.id %}", {
+                    method: "POST",
+                    headers: {
+                        "X-CSRFToken": "{{ csrf_token }}",
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ numero_serie: currentSerial })
+                })
+                .then(resp => resp.json())
+                .then(data => {
+                    if (data.success) {
+                        // 2️⃣ Si guardó bien, actualizar hidden y enviar el form de impresión
+                        inputSerial.value = currentSerial;
+
+                        Swal.fire({
+                            title: '¿Imprimir etiqueta doble?',
+                            text: 'Se imprimirá con los datos actuales del equipo.',
+                            icon: 'question',
+                            showCancelButton: true,
+                            confirmButtonText: 'Sí, imprimir',
+                            cancelButtonText: 'Cancelar',
+                            confirmButtonColor: '#3085d6',
+                            cancelButtonColor: '#d33'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                formImprimir.submit();
+                            }
+                        });
+
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error al guardar serial',
+                            text: data.error
+                        });
+                    }
+                })
+                .catch(err => {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'No se pudo actualizar el número de serie. Revisa la consola.',
+                    });
+                    console.error(err);
+                });
+            });
+
         });
-    });
     </script>
 </div>
 {% endblock %}
