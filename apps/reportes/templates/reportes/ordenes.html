@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}Detalle de Orden{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 mt-3">
+
+    <!-- 🔹 Encabezado principal -->
+    <div class="d-flex align-items-center mb-4">
+        <i class="bi bi-card-list fs-3 text-primary me-2"></i>
+        <h3 class="fw-bold text-primary m-0">Detalle de Orden ENIGMA-A{{ orden.id }}</h3>
+    </div>
+
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb bg-light rounded p-2">
+            <li class="breadcrumb-item">
+                <i class="bi bi-house-door"></i> Inicio
+            </li>
+            <li class="breadcrumb-item">
+                Órdenes
+            </li>
+            <li class="breadcrumb-item">
+                Avanzadas
+            </li>
+            <li class="breadcrumb-item text-primary" aria-current="page">Detalle</li>
+        </ol>
+    </nav>
+
+    <!-- Información general de la orden -->
+    <div class="row mb-4">
+<h1>Reporte de Órdenes</h1>
+
+<form method="get">
+    {{ form.as_p }}
+    <button type="submit">Filtrar</button>
+</form>
+
+{% if ordenes %}
+<table border="1" cellpadding="5">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Modelo</th>
+            <th>Estado</th>
+            <th>Fecha modificación</th>
+            <th>Activo</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for o in ordenes %}
+        <tr>
+            <td>{{ o.id }}</td>
+            <td>{{ o.modelo }}</td>
+            <td>{{ o.estado }}</td>
+            <td>{{ o.fecha_modificacion|date:"d/m/Y H:i" }}</td>
+            <td>{{ o.activo }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endif %}
+
+    </div>
+
+</div>
+{% endblock %}

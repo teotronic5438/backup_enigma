@@ -114,6 +114,36 @@
       </a>
     </li> -->
 
+    <!-- REPORTES -->
+    <li class="nav-item">
+      <a class="nav-link text-white d-flex justify-content-between align-items-center"
+        data-bs-toggle="collapse"
+        href="#submenuReportes"
+        role="button"
+        aria-expanded="false"
+        aria-controls="submenuReportes">
+        <span class="me-2">&#128202;</span> Reportes
+        <span class="ms-auto">&#9662;</span>
+      </a>
+      <ul class="collapse list-unstyled ps-3" id="submenuReportes" data-menu="submenuReportes">
+        <li>
+          <a class="nav-link text-white {% if request.resolver_match.url_name == 'reportes_ingresos' %}active{% endif %}" 
+            href="{% url 'reportes:ingresos' %}">
+            <span class="me-2">&#43;</span> Ingresos
+          </a>
+        </li>
+        <li>
+          <a class="nav-link text-white {% if request.resolver_match.url_name == 'reportes_ordenes' %}active{% endif %}" 
+            href="{% url 'reportes:ordenes' %}">
+            <span class="me-2">&#128221;</span> Órdenes
+          </a>
+        </li>
+        <!-- Podés agregar más reportes aquí -->
+      </ul>
+    </li>
+
+
+
     <!-- CONFIGURACIÓN -->
     <li class="nav-item mt-2">
       <a class="nav-link text-white d-flex justify-content-between align-items-center"

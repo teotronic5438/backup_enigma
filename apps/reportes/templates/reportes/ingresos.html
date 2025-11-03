@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container-fluid px-4 mt-3">
+
+    <!-- Encabezado principal -->
+    <div class="d-flex align-items-center mb-4">
+        <i class="bi bi-bar-chart-line fs-3 text-primary me-2"></i>
+        <h3 class="fw-bold text-primary m-0">Reporte de Ingresos</h3>
+    </div>
+
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb bg-light rounded p-2">
+            <li class="breadcrumb-item">
+                <i class="bi bi-house-door"></i> Inicio
+            </li>
+            <li class="breadcrumb-item text-primary" aria-current="page">Ingresos</li>
+        </ol>
+    </nav>
+
+    <!-- Formulario de filtro por fechas -->
+    <div class="card mb-3 shadow-sm">
+        <div class="card-body">
+            <form method="get" class="row g-3 align-items-end">
+                <div class="col-auto">
+                    <label for="fecha_inicio" class="form-label">Fecha Inicio</label>
+                    {{ form.fecha_inicio }}
+                </div>
+                <div class="col-auto">
+                    <label for="fecha_fin" class="form-label">Fecha Fin</label>
+                    {{ form.fecha_fin }}
+                </div>
+                <div class="col-auto d-flex align-items-end mb-3">
+                    <div class="form-check">
+                        {{ form.incluir_inactivas }}
+                        <label class="form-check-label" for="incluir_inactivas">Incluir inactivas</label>
+                    </div>
+                </div>
+
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-primary shadow-sm">
+                        <i class="bi bi-funnel-fill me-1"></i> Filtrar
+                    </button>
+                </div>
+
+                <div class="col-auto">
+                    <a href="{% url 'reportes:export_ingresos' %}?fecha_inicio={{ form.fecha_inicio.value }}&fecha_fin={{ form.fecha_fin.value }}&incluir_inactivas={{ form.incluir_inactivas.value }}" 
+                    class="btn btn-secondary shadow-sm">
+                    <i class="bi bi-file-earmark-excel me-1"></i> Exportar .CSV
+                    </a>
+                </div>
+
+                <div class="col-auto">
+                    <a href="{% url 'reportes:export_ingresos_excel' %}?fecha_inicio={{ form.fecha_inicio.value }}&fecha_fin={{ form.fecha_fin.value }}&incluir_inactivas={{ form.incluir_inactivas.value }}" 
+                    class="btn btn-success shadow-sm">
+                    <i class="bi bi-file-earmark-excel me-1"></i> Exportar Excel
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Tabla de reporte -->
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-0">
+            <table class="table table-bordered table-hover m-0 align-middle">
+                <thead class="table-primary text-center">
+                    <tr>
+                        <th colspan="10">
+                            Reporte de ingresos
+                            {% if form.fecha_inicio.value and form.fecha_fin.value %}
+                                del {{ form.fecha_inicio.value }} al {{ form.fecha_fin.value }}
+                            {% endif %}
+                        </th>
+                    </tr>
+                    <tr>
+                        <th>#</th>
+                        <th>Número Remito</th>
+                        <th>Número Viaje</th>
+                        <th>Detalle Transporte</th>
+                        <th>Depósito</th>
+                        <th>Producto</th>
+                        <th>Cantidad</th>
+                        <th>Fecha de Ingreso</th>
+                        <th>Usuario</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody class="text-center">
+                    {% for remito in ingresos %}
+                        {% for detalle in remito.remitoproducto_set.all %}
+                        <tr>
+                            {% if forloop.first %}
+                            <td rowspan="{{ remito.remitoproducto_set.count }}">{{ forloop.parentloop.counter }}</td>
+                            <td rowspan="{{ remito.remitoproducto_set.count }}">{{ remito.numero_remito }}</td>
+                            <td rowspan="{{ remito.remitoproducto_set.count }}">{{ remito.numero_viaje }}</td>
+                            <td rowspan="{{ remito.remitoproducto_set.count }}">{{ remito.detalle_transporte }}</td>
+                            <td rowspan="{{ remito.remitoproducto_set.count }}">{{ remito.deposito_id }}</td>
+                            <td>{{ detalle.producto_id.marca }} - {{ detalle.producto_id.modelo }}</td>
+                            <td>{{ detalle.cantidad }}</td>
+                            <td rowspan="{{ remito.remitoproducto_set.count }}">{{ remito.fecha_ingreso|date:"d M, Y" }}</td>
+                            <td rowspan="{{ remito.remitoproducto_set.count }}">{{ remito.usuario.nombre }}</td>
+                            <td rowspan="{{ remito.remitoproducto_set.count }}">
+                                {% if remito.aprobado %}
+                                    <span class="badge bg-success">Aprobado</span>
+                                {% else %}
+                                    <span class="badge bg-warning text-dark">Pendiente</span>
+                                {% endif %}
+                            </td>
+                            {% else %}
+                            <td>{{ detalle.producto_id.marca }} - {{ detalle.producto_id.modelo }}</td>
+                            <td>{{ detalle.cantidad }}</td>
+                            {% endif %}
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ remito.numero_remito }}</td>
+                            <td>{{ remito.numero_viaje }}</td>
+                            <td>{{ remito.detalle_transporte }}</td>
+                            <td>{{ remito.deposito_id }}</td>
+                            <td colspan="2">No hay productos</td>
+                            <td>{{ remito.fecha_ingreso|date:"d M, Y" }}</td>
+                            <td>{{ remito.usuario.nombre }}</td>
+                            <td>
+                                {% if remito.aprobado %}
+                                    <span class="badge bg-success">Aprobado</span>
+                                {% else %}
+                                    <span class="badge bg-warning text-dark">Pendiente</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    {% empty %}
+                    <tr>
+                        <td colspan="10" class="text-muted py-4">No hay ingresos registrados en este período.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+
+            </table>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
