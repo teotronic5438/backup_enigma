@@ -183,6 +183,42 @@ class RevisarOrdenUpdateView(LoginRequiredMixin, UpdateView):
             )
 '''
 
+# class RevisarOrdenUpdateView(LoginRequiredMixin, UpdateView):
+#     model = Ordenes
+#     form_class = OrdenForm
+#     template_name = 'ordenes/revisar_orden.html'
+#     success_url = reverse_lazy('ordenes_pendientes')
+
+#     def get_context_data(self, **kwargs):
+#         context = super().get_context_data(**kwargs)
+#         orden = self.object
+#         equipo_form = kwargs.get('equipo_form') or EquipoForm(instance=orden.equipo_id)
+#         context.update({
+#             'estados': Estados.objects.all(),
+#             'destinos': Destinos.objects.all(),
+#             'equipo_form': equipo_form
+#         })
+#         return context
+
+#     def post(self, request, *args, **kwargs):
+#         self.object = self.get_object()
+#         form = self.get_form()
+#         equipo_form = EquipoForm(request.POST, instance=self.object.equipo_id)
+
+#         if form.is_valid() and equipo_form.is_valid():
+#             orden = form.save(commit=False)
+#             orden.estado_id, _ = Estados.objects.get_or_create(nombre_estado='Revisado')
+#             orden.fecha_revision = now()
+#             orden.save()
+#             equipo_form.save()
+#             return self.form_valid(form)
+#         else:
+#             return self.render_to_response(
+#                 self.get_context_data(form=form, equipo_form=equipo_form)
+#             )
+
+from django.contrib import messages
+
 class RevisarOrdenUpdateView(LoginRequiredMixin, UpdateView):
     model = Ordenes
     form_class = OrdenForm
@@ -205,17 +241,32 @@ class RevisarOrdenUpdateView(LoginRequiredMixin, UpdateView):
         form = self.get_form()
         equipo_form = EquipoForm(request.POST, instance=self.object.equipo_id)
 
+        # ✅ Validación del lado servidor (extra por seguridad)
+        campos_obligatorios = [
+            ('falla_detectada', 'Falla detectada'),
+            ('reparacion', 'Reparación'),
+            ('destino', 'Destino'),
+        ]
+        faltantes = [nombre for campo, nombre in campos_obligatorios if not request.POST.get(campo)]
+        if not request.POST.get('numero_serie'):
+            faltantes.append('Número de serie')
+
+        if faltantes:
+            messages.error(request, f"Faltan completar: {', '.join(faltantes)}")
+            return self.render_to_response(self.get_context_data(form=form, equipo_form=equipo_form))
+
         if form.is_valid() and equipo_form.is_valid():
             orden = form.save(commit=False)
             orden.estado_id, _ = Estados.objects.get_or_create(nombre_estado='Revisado')
             orden.fecha_revision = now()
             orden.save()
             equipo_form.save()
+            messages.success(request, "✅ Orden actualizada correctamente.")
             return self.form_valid(form)
         else:
-            return self.render_to_response(
-                self.get_context_data(form=form, equipo_form=equipo_form)
-            )
+            messages.error(request, "❌ Hay errores en el formulario. Verifique los campos.")
+            return self.render_to_response(self.get_context_data(form=form, equipo_form=equipo_form))
+
 
 
 # creando solo ordenes activas de prueba
@@ -295,3 +346,33 @@ class OrdenesActivasListView(LoginRequiredMixin, ListView):
         context['filtro_palletizado'] = self.request.GET.getlist('palletizado')
 
         return context
+
+
+
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import get_object_or_404
+import json
+from .models import Ordenes
+
+@login_required
+@csrf_exempt
+def actualizar_serial(request, pk):
+    """
+    Vista para actualizar solo el número de serie del equipo vía AJAX
+    """
+    if request.method == "POST":
+        orden = get_object_or_404(Ordenes, id=pk)
+        data = json.loads(request.body)
+        serial = data.get("numero_serie", "").strip()
+        if not serial:
+            return JsonResponse({"success": False, "error": "El número de serie no puede estar vacío."})
+        
+        # Guardar el serial en el equipo relacionado
+        orden.equipo_id.numero_serie = serial
+        orden.equipo_id.save()
+
+        return JsonResponse({"success": True})
+
+    return JsonResponse({"success": False, "error": "Método no permitido"})

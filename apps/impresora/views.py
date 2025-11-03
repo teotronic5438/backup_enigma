@@ -158,7 +158,7 @@ def generar_codigo_epl(marca, modelo, serial):
     # Limitar longitud de textos
     marca = marca[:12]
     modelo = modelo[:12] 
-    serial = serial[:15]
+    serial = serial[:10]
     
     # Comandos EPL más básicos y estándar
     epl_commands = []
