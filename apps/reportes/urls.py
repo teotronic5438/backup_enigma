@@ -10,4 +10,7 @@ urlpatterns = [
     path('ordenes/', views.ReporteOrdenesView.as_view(), name='ordenes'),
     path('exportar/', views.ExportIngresosView.as_view(), name='export_ingresos'),
     path('exportar-excel/', views.ExportIngresosExcelView.as_view(), name='export_ingresos_excel'),  # NUEVA
+    # path('ordenes/', views.ReporteOrdenesView.as_view(), name='ordenes'),
+    path('exportar-ordenes-csv/', views.ExportOrdenesCSVView.as_view(), name='exportar_ordenes_csv'),
+    path('exportar-ordenes-excel/', views.ExportOrdenesExcelView.as_view(), name='exportar_ordenes_excel'),
 ]

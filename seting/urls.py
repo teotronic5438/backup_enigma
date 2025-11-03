@@ -31,5 +31,6 @@ urlpatterns = [
     path('despachos/', include('apps.despachos.urls')),
     # path('api/ingresos/', include('apps.ingresos.urls')),
     path('impresora/', include('apps.impresora.urls', namespace='impresora')),
-    path('impresora/', include('apps.reportes.urls', namespace='reportes')),
+    path('reportes/', include('apps.reportes.urls', namespace='reportes')),
+
 ]

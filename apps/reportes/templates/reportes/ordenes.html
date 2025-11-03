@@ -1,67 +1,99 @@
 {% extends "base.html" %}
 
-{% block title %}Detalle de Orden{% endblock %}
+{% block title %}Reporte de Órdenes{% endblock %}
 
 {% block content %}
 <div class="container-fluid px-4 mt-3">
 
-    <!-- 🔹 Encabezado principal -->
+    <!-- 🔹 Encabezado -->
     <div class="d-flex align-items-center mb-4">
         <i class="bi bi-card-list fs-3 text-primary me-2"></i>
-        <h3 class="fw-bold text-primary m-0">Detalle de Orden ENIGMA-A{{ orden.id }}</h3>
+        <h3 class="fw-bold text-primary m-0">Reporte de Órdenes</h3>
     </div>
 
     <!-- Breadcrumb -->
     <nav aria-label="breadcrumb" class="mb-4">
         <ol class="breadcrumb bg-light rounded p-2">
-            <li class="breadcrumb-item">
-                <i class="bi bi-house-door"></i> Inicio
-            </li>
-            <li class="breadcrumb-item">
-                Órdenes
-            </li>
-            <li class="breadcrumb-item">
-                Avanzadas
-            </li>
-            <li class="breadcrumb-item text-primary" aria-current="page">Detalle</li>
+            <li class="breadcrumb-item"><i class="bi bi-house-door"></i> Inicio</li>
+            <li class="breadcrumb-item">Órdenes</li>
+            <li class="breadcrumb-item text-primary" aria-current="page">Reporte</li>
         </ol>
     </nav>
 
-    <!-- Información general de la orden -->
+    <!-- Filtros -->
+    <form method="get" class="mb-4">
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Filtrar</button>
+        <a href="{% url 'reportes:exportar_ordenes_csv' %}?{{ request.GET.urlencode }}" class="btn btn-success">Exportar CSV</a>
+        <a href="{% url 'reportes:exportar_ordenes_excel' %}?{{ request.GET.urlencode }}" class="btn btn-success">Exportar Excel</a>
+    </form>
+
+    <!-- Resumen -->
     <div class="row mb-4">
-<h1>Reporte de Órdenes</h1>
-
-<form method="get">
-    {{ form.as_p }}
-    <button type="submit">Filtrar</button>
-</form>
-
-{% if ordenes %}
-<table border="1" cellpadding="5">
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Modelo</th>
-            <th>Estado</th>
-            <th>Fecha modificación</th>
-            <th>Activo</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for o in ordenes %}
-        <tr>
-            <td>{{ o.id }}</td>
-            <td>{{ o.modelo }}</td>
-            <td>{{ o.estado }}</td>
-            <td>{{ o.fecha_modificacion|date:"d/m/Y H:i" }}</td>
-            <td>{{ o.activo }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
-{% endif %}
-
+        <div class="col-md-4">
+            <div class="card text-white bg-primary mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">Órdenes pendientes</h5>
+                    <p class="card-text fs-3">{{ total_pendientes }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-white bg-success mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">Órdenes completadas</h5>
+                    <p class="card-text fs-3">{{ total_completadas }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-white bg-danger mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">Órdenes avería / destrucción</h5>
+                    <p class="card-text fs-3">{{ total_averia_destruccion }}</p>
+                </div>
+            </div>
+        </div>
     </div>
+
+    <!-- Tabla de órdenes -->
+    {% if ordenes %}
+    <table class="table table-bordered">
+        <thead class="table-light">
+            <tr>
+                <th>ID</th>
+                <th>Modelo</th>
+                <th>Estado</th>
+                <th>Tipo Acción</th>
+                <th>Fecha Creación</th>
+                <th>Fecha Modificación</th>
+                <th>Activo</th>
+                <th>Usuario</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for o in ordenes %}
+            <tr>
+                <td>{{ o.id }}</td>
+                <td>{{ o.modelo }}</td>
+                <td>{{ o.estado }}</td>
+                <td>{{ o.tipo_accion }}</td>
+                <td>{{ o.fecha_creacion|date:"d/m/Y H:i" }}</td>
+                <td>{{ o.fecha_modificacion|date:"d/m/Y H:i" }}</td>
+                <td>{{ o.activo }}</td>
+                <td>{% if o.usuario %}
+                        {{ o.usuario.nombre }}
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>No se encontraron órdenes.</p>
+    {% endif %}
 
 </div>
 {% endblock %}

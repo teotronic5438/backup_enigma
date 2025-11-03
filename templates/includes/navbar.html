@@ -122,22 +122,27 @@
         role="button"
         aria-expanded="false"
         aria-controls="submenuReportes">
-        <span class="me-2">&#128202;</span> Reportes
+        {% comment %} <span class="me-2">&#128202;</span> {% endcomment %}
+        <span class="me-2"></span>Reportes
         <span class="ms-auto">&#9662;</span>
       </a>
       <ul class="collapse list-unstyled ps-3" id="submenuReportes" data-menu="submenuReportes">
         <li>
           <a class="nav-link text-white {% if request.resolver_match.url_name == 'reportes_ingresos' %}active{% endif %}" 
             href="{% url 'reportes:ingresos' %}">
-            <span class="me-2">&#43;</span> Ingresos
+            {% comment %} <span class="me-2">&#43;</span>  {% endcomment %}
+            <span class="me-2">&#128202;</span>Ingresos
           </a>
         </li>
-        <li>
+        
+        {% comment %} <li>
           <a class="nav-link text-white {% if request.resolver_match.url_name == 'reportes_ordenes' %}active{% endif %}" 
             href="{% url 'reportes:ordenes' %}">
             <span class="me-2">&#128221;</span> Órdenes
           </a>
-        </li>
+        </li> {% endcomment %}
+
+
         <!-- Podés agregar más reportes aquí -->
       </ul>
     </li>
@@ -152,7 +157,8 @@
         role="button"
         aria-expanded="false"
         aria-controls="submenuConfiguracion">
-        <span class="me-2">&#9881;</span> Configuración
+        {% comment %} <span class="me-2">&#9881;</span> {% endcomment %}
+        <span class="me-2"></span>Configuración
         <span class="ms-auto">&#9662;</span>
       </a>
 
